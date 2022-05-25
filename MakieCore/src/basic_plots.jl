@@ -172,7 +172,7 @@ Plots a line for each pair of points in `(x, y, z)`, `(x, y)`, or `positions`.
 
 """
 @recipe(LineSegments, positions) do scene
-    default_theme(scene, Lines)
+    default_theme(scene, Lines())
 end
 
 """
@@ -346,7 +346,7 @@ Plots one or multiple texts passed via the `text` keyword.
         space = :data,
         markerspace = :pixel,
         offset = (0.0, 0.0),
-        word_wrap_width = -1, 
+        word_wrap_width = -1,
         inspectable = theme(scene, :inspectable)
     )
 end

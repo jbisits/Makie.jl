@@ -31,8 +31,11 @@ using LinearAlgebra
 # re-export Makie, including deprecated names
 for name in names(Makie, all=true)
     if Base.isexported(Makie, name)
-        @eval using Makie: $(name)
-        @eval export $(name)
+        try
+            @eval using Makie: $(name)
+            @eval export $(name)
+        catch e
+        end
     end
 end
 
@@ -62,9 +65,9 @@ end
 
 export set_window_config!
 
-if Base.VERSION >= v"1.4.2"
-    include("precompiles.jl")
-    _precompile_()
-end
+# if Base.VERSION >= v"1.4.2"
+#     include("precompile.jl")
+#     _precompile_()
+# end
 
 end

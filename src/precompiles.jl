@@ -59,7 +59,6 @@ function precompile_obs(x)
     end
 end
 
-
 function _precompile_()
     ccall(:jl_generating_output, Cint, ()) == 1 || return
     precompile(Makie.initialize_block!, (Axis,))

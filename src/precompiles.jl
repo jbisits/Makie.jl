@@ -85,4 +85,6 @@ function _precompile_()
     @assert precompile(Button, (Scene,))
     @assert precompile(Slider, (Scene,))
     @assert precompile(Textbox, (Scene,))
+    # Empty font cache, since any font in there isn't serializable by precompilation
+    empty!(FONT_CACHE)
 end

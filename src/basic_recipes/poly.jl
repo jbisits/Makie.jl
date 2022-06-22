@@ -44,9 +44,9 @@ convert_arguments(::Type{<: Poly}, v::Polygon) = (v,)
 
 convert_arguments(::Type{<: Poly}, args...) = ([convert_arguments(Scatter, args...)[1]],)
 convert_arguments(::Type{<: Poly}, vertices::AbstractArray, indices::AbstractArray) = convert_arguments(Mesh, vertices, indices)
-convert_arguments(::Type{<: Poly}, m::GeometryBasics.Mesh) = (m,)
+convert_arguments(::Type{<: Poly}, m::GeometryBasics.AbstractGeometry) = (m,)
 
-function plot!(plot::Poly{<: Tuple{Union{GeometryBasics.Mesh, GeometryPrimitive}}})
+function plot!(plot::Poly{<: Tuple{GeometryBasics.AbstractGeometry}})
     mesh!(
         plot, plot[1],
         color = plot[:color], colormap = plot[:colormap], colorrange = plot[:colorrange],
@@ -95,7 +95,6 @@ function to_line_segments(meshes::AbstractVector)
     for (i, mesh) in enumerate(meshes)
         points = to_line_segments(mesh)
         append!(line, points)
-        # push!(line, points[1])
         # dont need to separate the last line segment
         if i != length(meshes)
             push!(line, Point2f(NaN))
@@ -149,9 +148,17 @@ function plot!(plot::Poly{<: Tuple{<: Union{Polygon, AbstractVector{<: PolyEleme
     )
 end
 
-function plot!(plot::Mesh{<: Tuple{<: AbstractVector{P}}}) where P <: Union{AbstractMesh, Polygon}
+function convert_arguments(
+        MT::Type{<:Mesh},
+        meshes::AbstractVector{<: AbstractGeometry}
+    )
+    return ([triangle_mesh(m) for m in meshes],)
+end
+
+function plot!(plot::Mesh{<: Tuple{<: AbstractVector{P}}}) where P <: AbstractGeometry
     meshes = plot[1]
     color_node = plot.color
+
     attributes = Attributes(
         visible = plot.visible, shading = plot.shading, fxaa = plot.fxaa,
         inspectable = plot.inspectable, transparency = plot.transparency,
@@ -166,7 +173,7 @@ function plot!(plot::Mesh{<: Tuple{<: AbstractVector{P}}}) where P <: Union{Abst
     end
 
     num_meshes = lift(meshes; ignore_equal_values=true) do meshes
-        return length.(coordinates.(meshes))
+        return Int[length(coordinates(m)) for m in meshes]
     end
     mesh_colors = Observable{Union{Matrix{RGBAf}, RGBColors}}()
     map!(mesh_colors, plot.color, num_meshes) do colors, num_meshes
@@ -187,9 +194,9 @@ function plot!(plot::Mesh{<: Tuple{<: AbstractVector{P}}}) where P <: Union{Abst
         end
     end
     attributes[:color] = mesh_colors
-    m = lift(meshes) do meshes
-        return merge(GeometryBasics.mesh.(meshes))
+    bigmesh = lift(meshes) do meshes
+        return merge(meshes)
     end
-    mesh!(plot, attributes, m)
+    mesh!(plot, attributes, bigmesh)
     return
 end

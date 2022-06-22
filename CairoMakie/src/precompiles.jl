@@ -18,7 +18,7 @@ function _precompile_()
 
     )
     r = Rect2f(0, 0, 1, 1)
-    mesh = GeometryBasics.mesh(r)
+    mesh = GeometryBasics.triangle_mesh(r)
     CairoMakie.draw_mesh2D(scene, screen, attributes, mesh)
      mesh = GeometryBasics.uv_mesh(r)
     CairoMakie.draw_mesh2D(scene, screen, attributes, mesh)

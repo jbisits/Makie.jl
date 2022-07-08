@@ -1,7 +1,6 @@
 function _precompile_()
     ccall(:jl_generating_output, Cint, ()) == 1 || return
     precompile(Makie.backend_display, (GLBackend, Scene))
-
     activate!()
     precompile(refreshwindowcb, (GLFW.Window, Screen))
     # Mimic `display(p)` without actually creating a display
